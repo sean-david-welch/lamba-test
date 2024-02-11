@@ -1,6 +1,10 @@
 import os
+import logging
 import psycopg
+
 from pydantic import BaseModel
+
+logger = logging.getLogger()
 
 
 class Product(BaseModel):
@@ -10,17 +14,22 @@ class Product(BaseModel):
     price: float
 
 
-async def get_products():
+def get_products():
     database_url = os.environ.get("DATABASE_URL")
-    query = 'select * from "products"'
+    logger.info(database_url)
+    query = 'SELECT * FROM "products"'
 
     try:
-        async with psycopg.AsyncConnection.connect(database_url) as connection:
-            async with connection.cursor() as cursor:
-                await cursor.execute(query)
+        with psycopg.connect(database_url) as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(query)
 
-                rows = await cursor.fetchall()
+                rows = cursor.fetchall()
+                logger.info(f"Query executed successfully, fetched {len(rows)} rows.")
+                return [
+                    Product(id=row[0], name=row[1], description=row[2], price=row[3])
+                    for row in rows
+                ]
     except Exception as e:
-        print(f"An error occurred: {e}")
-
-    return None
+        logger.error(f"An error occurred in get_products: {e}", exc_info=True)
+        return None

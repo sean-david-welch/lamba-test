@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+    Function:
+        Timeout: 3
+        MemorySize: 128
+
+        Tracing: Active
+        LoggingConfig:
+            LogFormat: JSON
+    Api:
+        TracingEnabled: true
+Resources:
+    Products:
+        Type: AWS::Serverless::Function
+        Properties:
+            CodeUri: ./
+            Handler: app.lambda_handler
+            Runtime: python3.11
+            Architectures:
+                - x86_64
+
+            Environment:
+                Variables:
+                    DATABASE_URL: 'postgresql://postgres:Sean07441@host.docker.internal:5432/postgres?sslmode=disable'
+            Events:
+                HelloWorld:
+                    Type: Api
+                    Properties:
+                        Path: /
+                        Method: get
