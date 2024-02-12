@@ -6,27 +6,45 @@ Globals:
         Timeout: 3
         MemorySize: 128
 
+        Environment:
+            Variables:
+                DATABASE_URL: 'postgresql://postgres:Sean07441@host.docker.internal:5432/postgres?sslmode=disable'
+
         Tracing: Active
         LoggingConfig:
             LogFormat: JSON
     Api:
         TracingEnabled: true
+
 Resources:
-    Products:
+    GetProducts:
         Type: AWS::Serverless::Function
         Properties:
             CodeUri: ./
-            Handler: app.lambda_handler
+            Handler: app.get_products_handler
             Runtime: python3.11
             Architectures:
                 - x86_64
 
-            Environment:
-                Variables:
-                    DATABASE_URL: 'postgresql://postgres:Sean07441@host.docker.internal:5432/postgres?sslmode=disable'
             Events:
                 HelloWorld:
                     Type: Api
                     Properties:
-                        Path: /
+                        Path: /products
+                        Method: get
+
+    GetProductsById:
+        Type: AWS::Serverless::Function
+        Properties:
+            CodeUri: ./
+            Handler: app.get_product_id_handler
+            Runtime: python3.11
+            Architectures:
+                - x86_64
+
+            Events:
+                HelloWorld:
+                    Type: Api
+                    Properties:
+                        Path: /products/{id}
                         Method: get

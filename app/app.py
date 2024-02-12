@@ -1,13 +1,12 @@
 import json
 import logging
-from database.database import get_products
+from database.database import get_products, get_product_by_id
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-def lambda_handler(event, context):
-
+def get_products_handler(event, context):
     try:
         products = get_products()
         products_list = [product.model_dump() for product in products]
@@ -18,8 +17,32 @@ def lambda_handler(event, context):
                 {"message": "products fetched from postgres", "products": products_list}
             ),
         }
+
     except Exception as e:
         logger.error(f"Error in lambda_handler: {e}", exc_info=True)
+        return {
+            "statusCode": 500,
+            "body": json.dumps({"message": "Internal server error"}),
+        }
+
+
+def get_product_id_handler(event, context):
+    try:
+        id = event["pathParameters"]["id"]
+        product = get_product_by_id(id)
+
+        return {
+            "statusCode": 200,
+            "body": json.dumps(
+                {
+                    "message": "product fetch successfully",
+                    "product": product.model_dump(),
+                }
+            ),
+        }
+
+    except Exception as e:
+        logger.error(f"Error in get_product_id_handler: {e}", exc_info=True)
         return {
             "statusCode": 500,
             "body": json.dumps({"message": "Internal server error"}),
