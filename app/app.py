@@ -1,6 +1,6 @@
 import json
 import logging
-from database.database import get_products, get_product_by_id
+from database.database import get_products, get_product_by_id, create_product
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -46,4 +46,22 @@ def get_product_id_handler(event, context):
         return {
             "statusCode": 500,
             "body": json.dumps({"message": "Internal server error"}),
+        }
+
+
+def create_product_handler(event, context):
+    try:
+        product = event["product"]
+        create_product(product)
+
+        return {
+            "statusCode": 200,
+            "body": json.dumps({"message": "product created successfully"}),
+        }
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "body": json.dumps(
+                {"message": f"error occurred while creating product: {e}"}
+            ),
         }

@@ -48,3 +48,19 @@ Resources:
                     Properties:
                         Path: /products/{id}
                         Method: get
+
+    CreateProduct:
+        Type: AWS::Serverless::Function
+        Properties:
+            CodeUri: ./
+            Handler: app.create_product_handler
+            Runtime: python3.11
+            Architectures:
+                - x86_64
+
+            Events:
+                HelloWorld:
+                    Type: Api
+                    Properties:
+                        Path: /products
+                        Method: post

@@ -1,4 +1,5 @@
 import os
+import json
 import logging
 import psycopg
 
@@ -53,4 +54,22 @@ def get_product_by_id(id: int):
         logger.error(
             f"An error occurred while getting product by id: {e}", exc_info=True
         )
+        return None
+
+
+def create_product(product: Product):
+    database_url = os.environ.get("DATABASE_URL")
+    query = "INSERT INTO products (name, description, price) VALUES (%s, %s, %s)"
+    values = (product["name"], product["description"], product["price"])
+
+    try:
+        with psycopg.connect(database_url) as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(query, values)
+
+                connection.commit()
+
+        return True
+    except Exception as e:
+        logger.error(f"an error occurred while creating a product: {e}", exc_info=True)
         return None
