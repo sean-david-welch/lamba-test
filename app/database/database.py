@@ -15,9 +15,8 @@ class Product(BaseModel):
 
 
 def get_products():
-    database_url = os.environ.get("DATABASE_URL")
-    logger.info(database_url)
     query = 'SELECT * FROM "products"'
+    database_url = os.environ.get("DATABASE_URL")
 
     try:
         with psycopg.connect(database_url) as connection:
@@ -25,7 +24,6 @@ def get_products():
                 cursor.execute(query)
 
                 rows = cursor.fetchall()
-                logger.info(f"Query executed successfully, fetched {len(rows)} rows.")
                 return [
                     Product(id=row[0], name=row[1], description=row[2], price=row[3])
                     for row in rows

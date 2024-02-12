@@ -7,16 +7,16 @@ logger.setLevel(logging.INFO)
 
 
 def lambda_handler(event, context):
-    logger.info("Lambda handler started")
-    try:
-        logger.info("Retrieving products...")
-        products = get_products()
-        products_list = [product.dict() for product in products]
 
-        logger.info(f"Retrieved {len(products_list)} products")
+    try:
+        products = get_products()
+        products_list = [product.model_dump() for product in products]
+
         return {
             "statusCode": 200,
-            "body": json.dumps({"message": "hello world", "products": products_list}),
+            "body": json.dumps(
+                {"message": "products fetched from postgres", "products": products_list}
+            ),
         }
     except Exception as e:
         logger.error(f"Error in lambda_handler: {e}", exc_info=True)
